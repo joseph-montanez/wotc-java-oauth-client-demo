@@ -14,6 +14,12 @@ public class Main {
         newEmployee.ssn = "1234";
         newEmployee.started_on = "2018-11-01";
         newEmployee.dob = "1980-01-01";
+        newEmployee.address_street = "123 Street";
+        newEmployee.address_street2 = "123 Street";
+        newEmployee.address_city = "Vista";
+        newEmployee.address_state = "CA";
+        newEmployee.address_county = "San Diego";
+        newEmployee.address_zipcode = "92083";
 
         addedEmployee = api.addEmployee(newEmployee);
 

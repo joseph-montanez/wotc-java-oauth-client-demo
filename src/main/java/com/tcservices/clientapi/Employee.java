@@ -14,6 +14,12 @@ public class Employee {
     public String ssn;
     public String started_on;
     public String dob;
+    public String address_street;
+    public String address_street2;
+    public String address_city;
+    public String address_state;
+    public String address_county;
+    public String address_zipcode;
     public String created_at;
     public String updated_at;
 }
