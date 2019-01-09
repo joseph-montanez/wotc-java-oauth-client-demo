@@ -83,4 +83,32 @@ public class Api {
 
         return employee;
     }
+
+    /**
+     * Register Company
+     *
+     * @param company The company / owner details
+     * @return The response of the register request
+     */
+    @Nullable
+    public RegisterResponse register(RegisterRequest company) {
+        try {
+            HttpResponse<RegisterResponse> response = Unirest.post(String.format("%s/register", endPoint))
+                    .header("Accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", String.format("Bearer %s", lifetimeAccessToken))
+                    .body(company)
+                    .asObject(RegisterResponse.class);
+
+            RegisterResponse result = response.getBody();
+            int status = response.getStatus();
+            result.success = status >= 200 && status < 300;
+
+            return result;
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }

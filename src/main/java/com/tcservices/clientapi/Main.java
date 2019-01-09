@@ -1,7 +1,13 @@
 package com.tcservices.clientapi;
 
+import java.util.Random;
+
 public class Main {
     public static void main(String[] args) {
+        new Main().registerCompany();
+    }
+
+    private void addEmployee() {
         Api api = new Api();
 
         //-- Add Employee
@@ -34,6 +40,46 @@ public class Main {
             System.out.printf("Employee ID: %s%n", employee.id);
             System.out.printf("Employee First Name: %s%n", employee.first_name);
         });
+    }
 
+    private void registerCompany() {
+        Api api = new Api();
+
+        Random rand = new Random();
+
+        //-- Register Company Details
+        RegisterResponse result;
+        RegisterRequest registerReq = new RegisterRequest();
+        registerReq.ein = String.format("%d-%d", rand.nextInt(99) + 1, rand.nextInt(9999999) + 1);
+        registerReq.first_name = "Joe";
+        registerReq.last_name = "Doe";
+        registerReq.email = String.format("johndoe%d@gamil.com", rand.nextInt(9999999) + 1);
+        registerReq.phone = "619-555-5555";
+        registerReq.company_name = "Sample Company";
+        registerReq.address = "123 Street";
+        registerReq.address2 = "123 Street";
+        registerReq.city = "Vista";
+        registerReq.state = "CA";
+        registerReq.zipcode = "92083";
+        registerReq.website = "http://google.com";
+        registerReq.for_profit = false;
+
+        result = api.register(registerReq);
+
+        if (result != null && result.success) {
+            System.out.printf("Company ID: %d%n", result.company.id);
+            System.out.printf("WOTC URL: %s%n", result.wotc_url);
+            System.out.printf("Access Token: %s%n", result.token);
+        } else {
+            System.out.print("Unable to register company\n");
+            if (result.errors != null) {
+                for (String key : result.errors.keySet()) {
+                    for (String error : result.errors.get(key)) {
+                        System.out.printf("%s: %s\n", key, error);
+                    }
+                }
+
+            }
+        }
     }
 }
