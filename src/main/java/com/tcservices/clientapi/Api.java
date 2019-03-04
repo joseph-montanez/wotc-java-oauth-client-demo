@@ -5,6 +5,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import com.sun.istack.internal.Nullable;
 
 import java.io.IOException;
@@ -36,6 +38,18 @@ public class Api {
         });
     }
 
+    public HttpRequest setupHeader(HttpRequest request) {
+        return request.header("Accept", "application/json")
+                .header("Content-Type", "application/json")
+                .header("Authorization", String.format("Bearer %s", lifetimeAccessToken));
+    }
+
+    public HttpRequestWithBody setupHeader(HttpRequestWithBody request) {
+        return request.header("Accept", "application/json")
+                .header("Content-Type", "application/json")
+                .header("Authorization", String.format("Bearer %s", lifetimeAccessToken));
+    }
+
     /**
      * Get a list of employees
      *
@@ -44,11 +58,9 @@ public class Api {
     @Nullable
     public EmployeePagination getEmployees() {
         try {
-            HttpResponse<EmployeePagination> response
-                    = Unirest.get(String.format("%s/employees", endPoint))
-                    .header("Accept", "application/json")
-                    .header("Authorization", String.format("Bearer %s", lifetimeAccessToken))
-                    .asObject(EmployeePagination.class);
+            String url = String.format("%s/employees", endPoint);
+            HttpResponse<EmployeePagination> response;
+            response = setupHeader(Unirest.get(url)).asObject(EmployeePagination.class);
 
             EmployeePagination pagination = response.getBody();
 
@@ -69,12 +81,9 @@ public class Api {
     @Nullable
     public Employee addEmployee(Employee employee) {
         try {
-            HttpResponse<Employee> response = Unirest.post(String.format("%s/employees", endPoint))
-                    .header("Accept", "application/json")
-                    .header("Content-Type", "application/json")
-                    .header("Authorization", String.format("Bearer %s", lifetimeAccessToken))
-                    .body(employee)
-                    .asObject(Employee.class);
+            String url = String.format("%s/employees", endPoint);
+            HttpResponse<Employee> response;
+            response = setupHeader(Unirest.post(url)).body(employee).asObject(Employee.class);
 
             return response.getBody();
         } catch (UnirestException e) {
@@ -93,12 +102,9 @@ public class Api {
     @Nullable
     public RegisterResponse register(RegisterRequest company) {
         try {
-            HttpResponse<RegisterResponse> response = Unirest.post(String.format("%s/register", endPoint))
-                    .header("Accept", "application/json")
-                    .header("Content-Type", "application/json")
-                    .header("Authorization", String.format("Bearer %s", lifetimeAccessToken))
-                    .body(company)
-                    .asObject(RegisterResponse.class);
+            String url = String.format("%s/register", endPoint);
+            HttpResponse<RegisterResponse> response;
+            response = setupHeader(Unirest.post(url)).body(company).asObject(RegisterResponse.class);
 
             RegisterResponse result = response.getBody();
             int status = response.getStatus();
@@ -110,5 +116,76 @@ public class Api {
         }
 
         return null;
+    }
+
+    /**
+     * Upload Document
+     *
+     * @param file The bytes of the file to upload
+     * @return The response of the upload request
+     */
+    @Nullable
+    public DocumentResponse uploadDocument(byte[] file) {
+        try {
+            String url = String.format("%s/documents/upload", endPoint);
+            HttpResponse<DocumentResponse> response;
+            response = setupHeader(Unirest.post(url)).body(file).asObject(DocumentResponse.class);
+
+            return getDocumentResponse(response);
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Update Document
+     *
+     * @param documentId The ID of the document
+     * @param data The data to update the document with
+     * @return The response of the upload request
+     */
+    @Nullable
+    public DocumentResponse updateDocument(Integer documentId, DocumentUpdateRequest data) {
+        try {
+            String url = String.format("%s/documents/%d", endPoint, documentId);
+            HttpResponse<DocumentResponse> response;
+            response = setupHeader(Unirest.put(url)).body(data).asObject(DocumentResponse.class);
+
+            return getDocumentResponse(response);
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private DocumentResponse getDocumentResponse(HttpResponse<DocumentResponse> response) {
+        DocumentResponse result = response.getBody();
+        int status = response.getStatus();
+        result.success = status >= 200 && status < 300;
+
+        return result;
+    }
+
+    /**
+     * Get a list of employees
+     *
+     * @return
+     */
+    @Nullable
+    public DocumentPagination getDocuments() {
+        try {
+            String url = String.format("%s/documents", endPoint);
+            HttpResponse<DocumentPagination> response;
+            response = setupHeader(Unirest.get(url)).asObject(DocumentPagination.class);
+
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+
+            return null;
+        }
     }
 }

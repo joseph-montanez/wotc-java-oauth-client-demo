@@ -1,13 +1,68 @@
 package com.tcservices.clientapi;
 
+import com.sun.istack.internal.Nullable;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
-        new Main().registerCompany();
+        Main main = new Main();
+
+        //-- Create the employee
+        Employee employee = main.addEmployee();
+
+        DocumentResponse document = main.uploadDocument();
+
+        //-- Add the customer ID to the document
+        main.updateDocument(document.id, employee.id);
+
+        //-- Get the list of documents and print out its ID
+        ArrayList<Document> data = main.getDocuments().data;
+        data.stream()
+                .filter(document1 -> document.id.equals(document1.id) && employee.id.equals(document1.employee_id))
+                .forEach(document1 -> System.out.printf("Document upload successful, update also successful ID: %d matches employee ID: %d%n", document1.id, document1.employee_id));
+
+    }
+    private DocumentResponse updateDocument(Integer documentID, Integer employeeId) {
+        Api api = new Api();
+
+        DocumentUpdateRequest updateRequest = new DocumentUpdateRequest();
+        updateRequest.employee_id = employeeId;
+        updateRequest.document_type = "8850"; //-- This is up as an 8850 document
+
+        return api.updateDocument(documentID, updateRequest);
     }
 
-    private void addEmployee() {
+    private DocumentPagination getDocuments() {
+        Api api = new Api();
+
+        return api.getDocuments();
+    }
+
+    @Nullable
+    private DocumentResponse uploadDocument() {
+        Api api = new Api();
+
+        File file;
+        file = new File("./LICENSE");
+        DocumentResponse document = null;
+        try {
+            byte[] fileContent = Files.readAllBytes(file.toPath());
+            document = api.uploadDocument(fileContent);
+
+            System.out.printf("Added Document ID: %d%n", document.id);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return document;
+    }
+
+    private Employee addEmployee() {
         Api api = new Api();
 
         //-- Add Employee
@@ -33,6 +88,11 @@ public class Main {
             System.out.printf("Added Employee ID: %d%n", addedEmployee.id);
         }
 
+        return addedEmployee;
+    }
+
+    private EmployeePagination listEmployees() {
+        Api api = new Api();
         //-- List Employees
         EmployeePagination pagination = api.getEmployees();
         System.out.printf("Total Employees: %d%n", pagination.total);
@@ -40,6 +100,8 @@ public class Main {
             System.out.printf("Employee ID: %s%n", employee.id);
             System.out.printf("Employee First Name: %s%n", employee.first_name);
         });
+
+        return pagination;
     }
 
     private void registerCompany() {
