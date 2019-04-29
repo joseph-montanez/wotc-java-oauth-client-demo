@@ -7,7 +7,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
-import com.sun.istack.internal.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -187,5 +187,30 @@ public class Api {
 
             return null;
         }
+    }
+
+    /**
+     * Submit applicant WOTC
+     *
+     * @param wotc The wotc data to submit
+     * @return The response of the register request
+     */
+    @Nullable
+    public WotcResponse wotc(FormWotc wotc) {
+        try {
+            String url = String.format("%s/wotc", endPoint);
+            HttpResponse<WotcResponse> response;
+            response = setupHeader(Unirest.post(url)).body(wotc).asObject(WotcResponse.class);
+
+            WotcResponse result = response.getBody();
+            int status = response.getStatus();
+            result.success = status >= 200 && status < 300;
+
+            return result;
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }
