@@ -162,7 +162,8 @@ public class Main {
 
         FormWotc wotc = new FormWotc();
         Wotc form = new Wotc();
-        wotc.company_id = 446;
+        //-- This is optional
+        //wotc.company_id = 446;
         wotc.form = form;
 
 
