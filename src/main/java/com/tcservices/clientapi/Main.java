@@ -15,8 +15,20 @@ public class Main {
     public static void main(String[] args) {
         Main main = new Main();
 
-        //-- Submit WOTC
-        main.submitWotc();
+        LocationsResponse created = main.createLocation();
+
+        if (created.success) {
+            System.out.println("Location created");
+            created.locations
+                    .forEach(location -> System.out.printf("Location ID: %d\n", location.id));
+        }
+
+//        Stream.of(main.getLocations())
+//                .forEach(location -> System.out.printf("Location ID: %d\n", location.id));
+
+//        //-- Submit WOTC
+//        main.submitWotc();
+
 
 //        //-- Create the employee
 //        Employee employee = main.addEmployee();
@@ -151,6 +163,42 @@ public class Main {
 
             }
         }
+    }
+
+    private Location[] getLocations() {
+        Api api = new Api();
+
+        return api.getLocations();
+    }
+
+    private LocationsResponse createLocation() {
+        Api api = new Api();
+
+        Location loc = new Location();
+        loc.name = "Test 123";
+        loc.code = "t123";
+        loc.phone = "619-555-5555";
+        loc.address_city = "New York";
+        loc.address_state = "NY";
+        loc.address_zipcode = "12000";
+
+        LocationsResponse result = api.createLocation(loc);
+
+        if (result.success) {
+            System.out.println("Location Created!");
+        } else {
+            System.out.println("Unable to create location\n");
+            if (result.errors != null) {
+                for (String key : result.errors.keySet()) {
+                    for (String error : result.errors.get(key)) {
+                        System.out.printf("%s: %s\n", key, error);
+                    }
+                }
+
+            }
+        }
+
+        return result;
     }
 
     private void submitWotc() {

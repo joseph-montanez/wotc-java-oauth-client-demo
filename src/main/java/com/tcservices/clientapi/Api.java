@@ -16,6 +16,11 @@ public class Api {
     private String lifetimeAccessToken = "INSERT TOKEN HERE";
 
     Api() {
+        System.setProperty("org.apache.commons.logging.Log","org.apache.commons.logging.impl.SimpleLog");
+        System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
+        System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http", "DEBUG");
+        System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.wire", "DEBUG");
+
         Unirest.setObjectMapper(new ObjectMapper() {
             private com.fasterxml.jackson.databind.ObjectMapper jacksonObjectMapper
                     = new com.fasterxml.jackson.databind.ObjectMapper();
@@ -207,6 +212,77 @@ public class Api {
             result.success = status >= 200 && status < 300;
 
             return result;
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Get a list of locations
+     *
+     * @return
+     */
+    @Nullable
+    public Location[] getLocations() {
+        try {
+            String url = String.format("%s/locations", endPoint);
+            HttpResponse<Location[]> response;
+            response = setupHeader(Unirest.get(url)).asObject(Location[].class);
+
+
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+
+            return null;
+        }
+    }
+
+    /**
+     * Create location
+     *
+     * @param location The location data to submit
+     * @return The response of the locations created
+     */
+    @Nullable
+    public LocationsResponse createLocation(Location location) {
+        try {
+            String url = String.format("%s/locations", endPoint);
+            HttpResponse<LocationsResponse> response;
+            LocationCreateRequest request = new LocationCreateRequest();
+            request.location = location;
+
+
+            response = setupHeader(Unirest.post(url)).body(request).asObject(LocationsResponse.class);
+
+            LocationsResponse result = response.getBody();
+            int status = response.getStatus();
+            result.success = status >= 200 && status < 300;
+
+            return result;
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Update location
+     *
+     * @param location The location data to submit
+     * @return The response of the locations created
+     */
+    @Nullable
+    public Location[] updateLocation(Location location) {
+        try {
+            String url = String.format("%s/locations", endPoint);
+            HttpResponse<Location[]> response;
+            response = setupHeader(Unirest.put(url)).body(location).asObject(Location[].class);
+
+            return response.getBody();
         } catch (UnirestException e) {
             e.printStackTrace();
         }
