@@ -15,13 +15,21 @@ public class Main {
     public static void main(String[] args) {
         Main main = new Main();
 
-        LocationsResponse created = main.createLocation();
+        @Nullable EmployeeWotcUrlResponse response = main.getEmployeeWotcUrl();
 
-        if (created.success) {
-            System.out.println("Location created");
-            created.locations
-                    .forEach(location -> System.out.printf("Location ID: %d\n", location.id));
+        if (response != null) {
+            System.out.printf("WOTC URL: %s\n", response.url);
         }
+
+
+
+//        LocationsResponse created = main.createLocation();
+//
+//        if (created.success) {
+//            System.out.println("Location created");
+//            created.locations
+//                    .forEach(location -> System.out.printf("Location ID: %d\n", location.id));
+//        }
 
 //        Stream.of(main.getLocations())
 //                .forEach(location -> System.out.printf("Location ID: %d\n", location.id));
@@ -61,6 +69,12 @@ public class Main {
         Api api = new Api();
 
         return api.getDocuments();
+    }
+
+    private @Nullable EmployeeWotcUrlResponse getEmployeeWotcUrl() {
+        Api api = new Api();
+
+        return api.getEmployeeWotcUrl(2606);
     }
 
     @Nullable

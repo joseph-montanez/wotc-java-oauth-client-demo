@@ -145,6 +145,28 @@ public class Api {
     }
 
     /**
+     * Get Employee WOTC autofill URL
+     *
+     * @param employeeId The ID of the document
+     * @return The response with the URL of the employee WOTC form
+     */
+    public EmployeeWotcUrlResponse getEmployeeWotcUrl(Integer employeeId) {
+        try {
+            String url = String.format("%s/employees/%d/wotc/url", endPoint, employeeId);
+            HttpResponse<EmployeeWotcUrlResponse> response;
+            response = setupHeader(Unirest.get(url)).asObject(EmployeeWotcUrlResponse.class);
+
+            EmployeeWotcUrlResponse body = response.getBody();
+
+            return body;
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
      * Update Document
      *
      * @param documentId The ID of the document
