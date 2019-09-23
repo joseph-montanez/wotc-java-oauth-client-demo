@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) {
         Main main = new Main();
 
-        @Nullable EmployeeWotcUrlResponse response = main.getEmployeeWotcUrl();
+        @Nullable EmployeeWotcUrlResponse response = main.getEmployeeWotcUrl("http://google.com");
 
         if (response != null) {
             System.out.printf("WOTC URL: %s\n", response.url);
@@ -71,10 +71,10 @@ public class Main {
         return api.getDocuments();
     }
 
-    private @Nullable EmployeeWotcUrlResponse getEmployeeWotcUrl() {
+    private @Nullable EmployeeWotcUrlResponse getEmployeeWotcUrl(String Redirect) {
         Api api = new Api();
 
-        return api.getEmployeeWotcUrl(2606);
+        return api.getEmployeeWotcUrl(2606, Redirect);
     }
 
     @Nullable
